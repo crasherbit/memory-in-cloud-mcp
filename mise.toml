@@ -1,0 +1,19 @@
+[tools]
+node = "22"
+pnpm = "10"
+
+[tasks.install]
+description = "Install dependencies via pnpm"
+run = "pnpm install"
+
+[tasks.ingest]
+description = "Index a target monorepo. Usage: mise run ingest -- /abs/path/to/repo"
+run = "pnpm exec tsx src/indexer/cli.ts"
+
+[tasks.server]
+description = "Run the MCP server over stdio (normally Claude Code launches it)"
+run = "pnpm exec tsx src/server/cli.ts"
+
+[tasks.inspector]
+description = "Launch the MCP Inspector against the local server for manual tool calls"
+run = "pnpm dlx @modelcontextprotocol/inspector pnpm exec tsx src/server/cli.ts"

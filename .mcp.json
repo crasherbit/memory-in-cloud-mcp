@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "memory": {
+      "command": "pnpm",
+      "args": ["exec", "tsx", "src/server/cli.ts"]
+    }
+  }
+}
