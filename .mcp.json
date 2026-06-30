@@ -1,8 +1,12 @@
 {
   "mcpServers": {
     "memory": {
-      "command": "pnpm",
-      "args": ["exec", "tsx", "src/server/cli.ts"]
+      "url": "http://localhost:8080/mcp",
+      "transport": "http",
+      "headers": {
+        "Authorization": "Bearer ${MCP_MEM_KEY}",
+        "X-Agent-Id": "claude-code:${USER}"
+      }
     }
   }
 }

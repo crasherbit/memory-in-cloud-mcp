@@ -1,0 +1,142 @@
+{
+  "schema_version": "1.0",
+  "bundle_id": "crawler/2026-06-24T10:00:00Z/example-suffissi-template",
+  "branch": "develop",
+  "commit_sha": null,
+  "source_kind": "crawler",
+  "source_file": "comments.md",
+  "ingested_at": "2026-06-24T10:00:00Z",
+  "replace_edges": true,
+  "nodes": [
+    {
+      "type": "feature",
+      "name": "suffissi-template-eservice",
+      "title": "Suffissi Template E-Service (PIN-9154)",
+      "summary": "Estensione del modello e-service con instanceLabel suffix per identificare istanze multiple dello stesso template per uno stesso producer; permette di rinominare/aggiornare l'etichetta anche post-pubblicazione.",
+      "body_md": "Discovery del work: PR 3059, 3098, 3108, 3060, 3078, 3092, 3062, 3061, 3063, 3115, 3124, 3086.\n\nPattern: data model → creation → draft edit → post-publication edit → template rename adjustment. Validazione: uniqueness (producerId, templateId, instanceLabel) + composed-name uniqueness per producer.",
+      "summary_ai": "Feature trasversale al catalogo e-service che introduce instanceLabel come suffisso opzionale per distinguere istanze multiple di uno stesso template per producer.",
+      "keywords": [
+        "instanceLabel",
+        "instance label",
+        "etichetta istanza",
+        "suffisso template",
+        "template suffix",
+        "PIN-9154",
+        "PIN-9236",
+        "PIN-9242",
+        "renaming template",
+        "uniqueness producer template"
+      ],
+      "aliases": [
+        "instance-label",
+        "instancelabel",
+        "PIN-9154",
+        "suffisso template"
+      ],
+      "extra": {
+        "jira_keys": ["PIN-9154", "PIN-9236", "PIN-9242", "PIN-9261", "PIN-9263", "PIN-9264", "PIN-9350", "PIN-9365", "PIN-9399", "PIN-9432"],
+        "pr_count": 12,
+        "epic_key": "PIN-9154"
+      },
+      "links": [
+        { "relation": "includes", "target_type": "pr", "target_name": "3059" },
+        { "relation": "includes", "target_type": "pr", "target_name": "3063" }
+      ]
+    },
+    {
+      "type": "pr",
+      "name": "3059",
+      "title": "PIN-9236 Add instanceLabel in eservice",
+      "summary": "Estende il data model (proto+zod+sql+OpenAPI) con instanceLabel opzionale; max template name a 45 char per preservare il composed-name <60.",
+      "body_md": "Author: taglioni-r · State: MERGED · Files: 20\n\nDomain: Core data model expansion for instanceLabel field (Work Item 1).\n\nNotes:\n- Field opzionale (nullable in DB).\n- Max template name length 45 char per preservare 60-char e-service name (name + ' - ' + suffix).\n- Nessuna data migration per istanze esistenti.",
+      "source_url": "https://github.com/pagopa/interop-be-monorepo/pull/3059",
+      "summary_ai": "Aggiunge instanceLabel opzionale al modello e-service (proto, zod, SQL, OpenAPI) e ai converter BFF/catalog-process.",
+      "keywords": [
+        "instanceLabel",
+        "data model",
+        "proto",
+        "zod",
+        "OpenAPI",
+        "catalog-process",
+        "BFF",
+        "PIN-9236",
+        "eservice schema"
+      ],
+      "aliases": ["PIN-9236", "instanceLabel-add"],
+      "extra": {
+        "jira_keys": ["PIN-9236"],
+        "author": "taglioni-r",
+        "state": "MERGED",
+        "files_count": 20
+      },
+      "links": [
+        { "relation": "touches", "target_type": "package", "target_name": "catalog-process" },
+        { "relation": "touches", "target_type": "package", "target_name": "models" },
+        { "relation": "touches", "target_type": "package", "target_name": "readmodel-models" },
+        { "relation": "touches", "target_type": "package", "target_name": "backend-for-frontend" },
+        { "relation": "touches", "target_type": "package", "target_name": "api-clients" }
+      ]
+    },
+    {
+      "type": "pr",
+      "name": "3063",
+      "title": "PIN-9263 Edit instanceLabel after publication",
+      "summary": "Nuovo endpoint POST /templates/eservices/{id}/instanceLabel/update + nuovo evento EServiceInstanceLabelUpdated propagato a 12+ consumer.",
+      "body_md": "Author: taglioni-r · State: MERGED · Files: 38\n\nDomain: New endpoint and event for post-publication instanceLabel modification (Work Item 4, most extensive change).\n\nFollows existing pattern for point updates (e.g. POST /eservices/{eServiceId}/name/update). Distributed update pattern: tutti i consumer devono essere deployati per gestire il nuovo evento.",
+      "source_url": "https://github.com/pagopa/interop-be-monorepo/pull/3063",
+      "summary_ai": "Introduce endpoint REST per modificare instanceLabel post-pubblicazione e l'evento EServiceInstanceLabelUpdated, con propagation a tutti i consumer (12+) di catalog/notification.",
+      "keywords": [
+        "instanceLabel update",
+        "post publication edit",
+        "EServiceInstanceLabelUpdated",
+        "event propagation",
+        "consumer update",
+        "outbound-writer",
+        "platformstate-writer",
+        "readmodel-writer",
+        "m2m-event-dispatcher",
+        "PIN-9263"
+      ],
+      "aliases": ["PIN-9263", "EServiceInstanceLabelUpdated"],
+      "extra": {
+        "jira_keys": ["PIN-9263"],
+        "author": "taglioni-r",
+        "state": "MERGED",
+        "files_count": 38
+      },
+      "links": [
+        { "relation": "touches", "target_type": "package", "target_name": "catalog-process" },
+        { "relation": "touches", "target_type": "package", "target_name": "backend-for-frontend" },
+        { "relation": "touches", "target_type": "package", "target_name": "models" },
+        { "relation": "touches", "target_type": "package", "target_name": "catalog-outbound-writer" },
+        { "relation": "touches", "target_type": "package", "target_name": "catalog-platformstate-writer" },
+        { "relation": "touches", "target_type": "package", "target_name": "catalog-readmodel-writer-sql" },
+        { "relation": "touches", "target_type": "package", "target_name": "m2m-event-dispatcher" },
+        { "relation": "touches", "target_type": "package", "target_name": "events-signer" }
+      ]
+    },
+    {
+      "type": "endpoint",
+      "name": "POST /templates/eservices/{eServiceId}/instanceLabel/update",
+      "title": "Update e-service instance label",
+      "summary": "Aggiorna l'instanceLabel di un'istanza di e-service template post-pubblicazione.",
+      "body_md": "Modifica l'instanceLabel di un'istanza esistente. Emette l'evento EServiceInstanceLabelUpdated per i consumer del read model e delle notifiche.",
+      "keywords": [
+        "instanceLabel",
+        "update label",
+        "post publication",
+        "PATCH-like POST",
+        "modifica etichetta istanza"
+      ],
+      "aliases": ["instanceLabel update", "update label"],
+      "extra": {
+        "jira_keys": ["PIN-9263"],
+        "introduced_by_pr": "3063"
+      },
+      "links": [
+        { "relation": "introduced_by", "target_type": "pr", "target_name": "3063" },
+        { "relation": "belongs_to", "target_type": "package", "target_name": "catalog-process" }
+      ]
+    }
+  ]
+}

@@ -3,3 +3,12 @@ dist/
 data/
 .DS_Store
 *.log
+*.bak
+
+# Workflow-generated ingest inputs/outputs (regenerated per discovery run)
+filesExt/
+bundles/
+
+# Local scratch / personal notes
+appunti.md
+.claude/settings.local.json

@@ -1,16 +1,22 @@
 {
-  "name": "mcp-memory-poc",
-  "version": "0.1.0",
+  "name": "mcp-mem",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "ingest": "tsx src/indexer/cli.ts",
-    "server": "tsx src/server/cli.ts"
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server/cli.js",
+    "serve": "tsx src/server/cli.ts",
+    "ingest-client": "tsx src/cli/cli.ts"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@hono/node-server": "^1.13.0",
+    "@modelcontextprotocol/sdk": "^1.10.0",
     "better-sqlite3": "^11.0.0",
-    "fast-glob": "^3.3.0"
+    "fast-glob": "^3.3.0",
+    "hono": "^4.6.0",
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.0",

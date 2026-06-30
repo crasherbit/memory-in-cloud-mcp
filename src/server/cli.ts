@@ -1,66 +1,38 @@
 #!/usr/bin/env node
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
-import { openDb } from "../shared/db.js";
-import { getContext } from "./tools/getContext.js";
+import { serve } from "@hono/node-server";
+import { Hono } from "hono";
+import { adminRoutes } from "./admin.js";
+import { bearerAuth, bodyCap, rateLimit } from "./middleware/auth.js";
+import { closeAll } from "./dbPool.js";
+import { handleMcpRequest } from "./transport/http.js";
 
-const TOOL_NAME = "get_context";
+const PORT = Number(process.env.PORT ?? 8080);
 
-async function main(): Promise<void> {
-  const db = openDb();
+const app = new Hono();
 
-  const server = new Server(
-    { name: "memory", version: "0.1.0" },
-    { capabilities: { tools: {} } }
-  );
+app.get("/healthz", (c) => c.json({ ok: true, version: "0.3.0" }));
 
-  server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: [
-      {
-        name: TOOL_NAME,
-        description:
-          "Retrieve pre-computed context (nodes) from the indexed monorepo relevant to the given task/ticket text. Call at the start of a coding task that mentions a service, package, or codebase area.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            text: {
-              type: "string",
-              description:
-                "Raw task/ticket text (no need to pre-summarize).",
-            },
-          },
-          required: ["text"],
-          additionalProperties: false,
-        },
-      },
-    ],
-  }));
+// Admin routes (auth on each route; workspace is an optional query param).
+adminRoutes(app);
 
-  server.setRequestHandler(CallToolRequestSchema, async (req) => {
-    if (req.params.name !== TOOL_NAME) {
-      throw new Error(`Unknown tool: ${req.params.name}`);
-    }
-    const args = req.params.arguments as { text?: unknown } | undefined;
-    if (!args || typeof args.text !== "string") {
-      throw new Error("Missing required argument: text (string)");
-    }
-    const result = getContext(db, args.text);
-    return {
-      content: [
-        { type: "text", text: JSON.stringify(result, null, 2) },
-      ],
-    };
-  });
-
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-}
-
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
+// MCP endpoint. Streamable HTTP stateless. Tenant scope (if any) is an optional
+// `workspace` argument on each tool call, not part of the URL.
+app.all("/mcp", bodyCap, bearerAuth, rateLimit, async (c) => {
+  return handleMcpRequest(c);
 });
+
+const server = serve({
+  fetch: app.fetch,
+  port: PORT,
+});
+
+console.log(`[mcp-mem] listening on http://0.0.0.0:${PORT}`);
+
+const shutdown = (signal: string) => {
+  console.log(`[mcp-mem] ${signal} received, shutting down`);
+  closeAll();
+  server.close(() => process.exit(0));
+  setTimeout(() => process.exit(0), 3000).unref();
+};
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));

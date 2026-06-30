@@ -6,14 +6,26 @@ pnpm = "10"
 description = "Install dependencies via pnpm"
 run = "pnpm install"
 
-[tasks.ingest]
-description = "Index a target monorepo. Usage: mise run ingest -- /abs/path/to/repo"
-run = "pnpm exec tsx src/indexer/cli.ts"
+[tasks.typecheck]
+description = "Type-check without emitting"
+run = "pnpm exec tsc --noEmit"
 
-[tasks.server]
-description = "Run the MCP server over stdio (normally Claude Code launches it)"
+[tasks.build]
+description = "Compile TypeScript to dist/ for production"
+run = "pnpm exec tsc -p tsconfig.build.json"
+
+[tasks.start]
+description = "Run the compiled production server (requires `mise run build`)."
+run = "node dist/server/cli.js"
+
+[tasks.serve]
+description = "Run the MCP-MEM HTTP server in dev (tsx). Reads API_KEY, PORT, DATA_DIR from env."
 run = "pnpm exec tsx src/server/cli.ts"
 
+[tasks."ingest-client"]
+description = "Run the reference ingest client. Usage: mise run ingest-client -- --org X --repo Y --monorepo /abs/path --filesExt /abs/path"
+run = "pnpm exec tsx src/cli/cli.ts"
+
 [tasks.inspector]
-description = "Launch the MCP Inspector against the local server for manual tool calls"
-run = "pnpm dlx @modelcontextprotocol/inspector pnpm exec tsx src/server/cli.ts"
+description = "Launch the MCP Inspector against the local HTTP server"
+run = "pnpm dlx @modelcontextprotocol/inspector"

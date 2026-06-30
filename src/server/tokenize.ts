@@ -1,12 +1,13 @@
-const MIN_LEN = 3;
-const TOKEN_RE = /[A-Za-z0-9][A-Za-z0-9_-]*/g;
+// Token splitter for downstream uses (e.g. exact/alias lookup). No length or
+// regex filter is applied: callers receive every non-empty word.
+const SPLIT_RE = /[\s,;:!?(){}\[\]<>"`]+/u;
 
 export function tokenize(text: string): string[] {
-  const matches = text.match(TOKEN_RE) ?? [];
   const out = new Set<string>();
-  for (const m of matches) {
-    const lower = m.toLowerCase();
-    if (lower.length >= MIN_LEN) out.add(lower);
+  for (const raw of text.split(SPLIT_RE)) {
+    const t = raw.trim();
+    if (t.length === 0) continue;
+    out.add(t.toLowerCase());
   }
   return Array.from(out);
 }
